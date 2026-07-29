@@ -1,0 +1,30 @@
+## .NET  
+ECHO is on.
+## Build artifacts  
+bin/  
+obj/  
+ECHO is on.
+## VS files  
+.vs/  
+ECHO is on.
+## User-specific files  
+*.user  
+*.suo  
+*.userosscache  
+ECHO is on.
+## NuGet  
+*.nupkg  
+packages/  
+ECHO is on.
+## IDE  
+.idea/  
+*.swp  
+*.sln.docstates  
+ECHO is on.
+## OS  
+.DS_Store  
+Thumbs.db  
+ECHO is on.
+## Project-specific  
+*.log  
+*.tmp 

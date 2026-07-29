@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="src\Shared\PaymentSystem.Shared.Domain\PaymentSystem.Shared.Domain.csproj" />
+  <Project Path="src\Shared\PaymentSystem.Shared.Application\PaymentSystem.Shared.Application.csproj" />
+  <Project Path="src\Shared\PaymentSystem.Shared.Infrastructure\PaymentSystem.Shared.Infrastructure.csproj" />
+  <Project Path="src\Shared\PaymentSystem.Shared.Presentation\PaymentSystem.Shared.Presentation.csproj" />
+</Solution>
