@@ -87,28 +87,29 @@ public sealed class Operation : Entity
     /// Если статус CREATED — переводит в PROCESSING.
     /// Если статус COMPLETED или REJECTED — возвращает Success (200, идемпотентность).
     /// </summary>
-    public Result<OperationTransition> Submit(DateTime occurredAt)
+    public Result<bool> Submit(DateTime occurredAt)
     {
         if (Status == OperationStatus.CREATED)
         {
             Status = OperationStatus.PROCESSING;
             UpdatedAt = occurredAt;
 
-            var transition = AddTransition(
+            AddTransition(
                 OperationStatus.PROCESSING, OperationStatus.CREATED, OperationStatus.PROCESSING,
                 "Operation submitted for processing", occurredAt);
 
             RaiseDomainEvent(new Events.OperationSubmittedDomainEvent(OperationId));
 
-            return Result.Success(transition);
+            // Статус изменён: CREATED → PROCESSING
+            return Result.Success(true);
         }
 
-        // COMPLETED или REJECTED — идемпотентный повтор
-        var repeatTransition = AddTransition(
+        // COMPLETED или REJECTED — идемпотентный повтор, статус не изменён
+        AddTransition(
             Status, Status, Status,
             "Repeat submit attempt", occurredAt);
 
-        return Result.Success(repeatTransition);
+        return Result.Success(false);
     }
 
     /// <summary>
