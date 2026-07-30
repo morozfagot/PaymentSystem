@@ -130,11 +130,16 @@ public sealed class Operation : Entity
             }
 
             // Повторная или поздняя квитанция — логируем игнорирование
-            // toStatus = текущий финальный статус (не меняется)
             AddTransition(status, Status, Status,
                 $"Ignored duplicate/late receipt: {message}", paidAt);
 
             return Result.Success();
+        }
+
+        // Квитанция для операции не в PROCESSING (CREATED) — ошибка 
+        if (Status != OperationStatus.PROCESSING)
+        {
+            return Result.Failure(OperationErrors.InvalidStatus(OperationStatus.PROCESSING, Status));
         }
 
         // PROCESSING — меняем статус на полученный из квитанции
