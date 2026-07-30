@@ -9,4 +9,5 @@ public sealed record EventResponse(
     OperationStatus? FromStatus,
     OperationStatus ToStatus,
     string Message,
-    DateTime OccurredAt);
+    DateTime OccurredAt,
+    bool StateChanged);

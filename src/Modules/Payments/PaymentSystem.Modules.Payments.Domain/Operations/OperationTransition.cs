@@ -40,4 +40,10 @@ public sealed record OperationTransition
     /// Время перехода (UTC).
     /// </summary>
     public DateTime OccurredAt { get; init; }
+
+    /// <summary>
+    /// Было ли применено изменение статуса (true) или это идемпотентный повтор (false).
+    /// Вычисляется как FromStatus != ToStatus.
+    /// </summary>
+    public bool StateChanged { get; init; }
 }

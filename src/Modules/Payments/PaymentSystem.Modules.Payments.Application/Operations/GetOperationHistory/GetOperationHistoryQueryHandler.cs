@@ -26,7 +26,8 @@ internal sealed class GetOperationHistoryQueryHandler(
                 t.FromStatus,
                 t.ToStatus,
                 t.Message,
-                t.OccurredAt))
+                t.OccurredAt,
+                t.StateChanged))
             .ToList();
 
         return events;

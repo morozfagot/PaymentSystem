@@ -168,6 +168,7 @@ public sealed class Operation : Entity
             ToStatus = toStatus,
             Message = message,
             OccurredAt = occurredAt,
+            StateChanged = fromStatus != toStatus,
         };
 
         _transitions.Add(transition);
