@@ -14,9 +14,4 @@ public interface IOperationRepository
     /// Добавляет новую операцию.
     /// </summary>
     Task AddAsync(Operation operation, CancellationToken ct = default);
-
-    /// <summary>
-    /// Получает все операции в статусе PROCESSING (для фоновой отправки).
-    /// </summary>
-    Task<List<Operation>> GetProcessingOperationsAsync(CancellationToken ct = default);
 }
