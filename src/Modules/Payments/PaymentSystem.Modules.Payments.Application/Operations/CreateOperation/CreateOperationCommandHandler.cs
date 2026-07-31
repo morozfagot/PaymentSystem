@@ -1,4 +1,5 @@
 using PaymentSystem.Modules.Payments.Application.Operations.Abstractions;
+using PaymentSystem.Modules.Payments.Application.Operations.GetOperation;
 using PaymentSystem.Modules.Payments.Domain.Operations;
 using PaymentSystem.Shared.Application.Messaging;
 using PaymentSystem.Shared.Domain;

@@ -1,6 +1,6 @@
 using PaymentSystem.Modules.Payments.Domain.Operations;
 
-namespace PaymentSystem.Modules.Payments.Application.Operations.CreateOperation;
+namespace PaymentSystem.Modules.Payments.Application.Operations.GetOperation;
 
 public sealed record OperationResponse(
     string OperationId,
