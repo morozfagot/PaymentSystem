@@ -2,11 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using PaymentSystem.Modules.Payments.Application;
 using PaymentSystem.Modules.Payments.Application.Operations.Abstractions;
 using PaymentSystem.Modules.Payments.Domain.Operations;
 using PaymentSystem.Modules.Payments.Infrastructure.Database;
 using PaymentSystem.Modules.Payments.Infrastructure.Database.Outbox;
+using PaymentSystem.Modules.Payments.Infrastructure.Provider;
 using PaymentSystem.Shared.Application.Data;
 using PaymentSystem.Shared.Application.Messaging;
 using PaymentSystem.Shared.Infrastructure.Outbox;
@@ -20,7 +22,8 @@ namespace PaymentSystem.Modules.Payments.Infrastructure;
 public static class InfrastructureConfiguration
 {
     /// <summary>
-    /// Регистрирует PaymentsDbContext (SQLite), репозиторий, UnitOfWork и Outbox-обработку.
+    /// Регистрирует PaymentsDbContext (SQLite), репозиторий, UnitOfWork, Outbox-обработку
+    /// и HTTP-клиент для provider-simulator.
     /// </summary>
     public static IServiceCollection AddPaymentsInfrastructure(
         this IServiceCollection services,
@@ -51,6 +54,21 @@ public static class InfrastructureConfiguration
 
         // Outbox options из конфигурации
         services.Configure<OutboxOptions>(configuration.GetSection("Payments:Outbox"));
+
+        // Provider options из конфигурации
+        services.Configure<ProviderOptions>(configuration.GetSection(ProviderOptions.SectionName));
+
+        // HTTP-клиент для provider-simulator 
+        services.AddHttpClient<ProviderSimulatorClient>((sp, client) =>
+        {
+            ProviderOptions options = sp.GetRequiredService<IOptions<ProviderOptions>>().Value;
+            client.BaseAddress = new Uri(options.BaseUrl.TrimEnd('/') + '/');
+            client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+        });
+
+        // Регистрация IPaymentService
+        services.TryAddScoped<IPaymentService>(sp =>
+            sp.GetRequiredService<ProviderSimulatorClient>());
 
         // Quartz
         services.AddQuartz(configurator =>

@@ -2,4 +2,6 @@ using PaymentSystem.Shared.Application.Messaging;
 
 namespace PaymentSystem.Modules.Payments.Application.Operations.SubmitOperation;
 
-public sealed record SubmitOperationToProviderCommand(string OperationId) : ICommand;
+public sealed record SubmitOperationToProviderCommand(
+    string OperationId,
+    int AttemptNumber) : ICommand;

@@ -20,12 +20,13 @@ internal sealed class SubmitOperationToProviderCommandHandler(
             return Result.Failure(OperationErrors.NotFound(request.OperationId));
         }
 
-        // Вызов внешнего платёжного сервиса
+        // Вызов внешнего платёжного сервиса с номером попытки
         // Результат обрабатывается через callback (ProcessReceipt)
         return await paymentService.SubmitAsync(
             operation.OperationId,
             operation.Amount,
             operation.Currency,
+            request.AttemptNumber,
             cancellationToken);
     }
 }

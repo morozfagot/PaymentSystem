@@ -97,7 +97,8 @@ internal sealed class ProcessOutboxJob(
              SELECT
                  id AS {nameof(OutboxMessageResponse.Id)},
                  content AS {nameof(OutboxMessageResponse.Content)},
-                 type AS {nameof(OutboxMessageResponse.Type)}
+                 type AS {nameof(OutboxMessageResponse.Type)},
+                 try_count AS {nameof(OutboxMessageResponse.TryCount)}
              FROM payments.outbox_messages
              WHERE processed_on_utc IS NULL
                AND (try_count IS NULL OR try_count < {MaxRetryAttempts})
@@ -139,5 +140,9 @@ internal sealed class ProcessOutboxJob(
             transaction: transaction);
     }
 
-    internal sealed record OutboxMessageResponse(Guid Id, string Content, string Type);
+    internal sealed record OutboxMessageResponse(
+        Guid Id,
+        string Content,
+        string Type,
+        int? TryCount);
 }
