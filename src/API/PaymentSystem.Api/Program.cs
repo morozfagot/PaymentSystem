@@ -17,6 +17,11 @@ builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
+
 Assembly[] moduleApplicationAssemblies = [
     PaymentSystem.Modules.Payments.Application.AssemblyReference.Assembly];
 
