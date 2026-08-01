@@ -1,19 +1,18 @@
 using System.Data.Common;
 using Dapper;
-using PaymentSystem.Modules.Payments.Application.Operations.SubmitOperation;
 using PaymentSystem.Modules.Payments.Domain.Operations.Events;
-using PaymentSystem.Modules.Payments.Infrastructure.Provider;
 using PaymentSystem.Shared.Application.Data;
+using PaymentSystem.Shared.Application.Exceptions;
 using PaymentSystem.Shared.Application.Messaging;
 using PaymentSystem.Shared.Domain;
 using MediatR;
 
-namespace PaymentSystem.Modules.Payments.Infrastructure.Database.Outbox;
+namespace PaymentSystem.Modules.Payments.Application.Operations.SubmitOperation;
 
 /// <summary>
 /// Обработчик доменного события OperationSubmittedDomainEvent.
 /// Читает try_count из outbox, инкрементирует и отправляет команду.
-/// При ошибке провайдера выбрасывает ProviderTransientException,
+/// При ошибке провайдера выбрасывает исключение,
 /// чтобы ProcessOutboxJob сделал retry.
 /// </summary>
 internal sealed class SubmitOperationToProviderDomainEventHandler(
@@ -35,7 +34,7 @@ internal sealed class SubmitOperationToProviderDomainEventHandler(
 
         if (result.IsFailure)
         {
-            throw new ProviderTransientException(result.Error);// смотри как ошибки пробрасываются в исключения в проекте евентли, у тебя есть пример, не изобретай ничего
+            throw new PaymentSystemException(nameof(SubmitOperationToProviderCommand));
         }
     }
 
@@ -46,7 +45,7 @@ internal sealed class SubmitOperationToProviderDomainEventHandler(
         const string sql =
             """
             SELECT COALESCE(try_count, 0) + 1
-            FROM payments.outbox_messages
+            FROM outbox_messages
             WHERE content LIKE @Pattern
             ORDER BY occurred_on_utc DESC
             LIMIT 1

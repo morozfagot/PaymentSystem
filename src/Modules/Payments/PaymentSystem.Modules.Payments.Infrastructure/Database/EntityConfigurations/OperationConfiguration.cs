@@ -58,9 +58,9 @@ internal sealed class OperationConfiguration : IEntityTypeConfiguration<Operatio
             transitionBuilder.WithOwner()
                 .HasForeignKey("OperationId");
 
-            // EventId — auto-increment PK внутри owned-таблицы
+            // EventId — генерируется в коде (AddTransition через _transitions.Count + 1)
             transitionBuilder.Property(t => t.EventId)
-                .ValueGeneratedOnAdd();
+                .ValueGeneratedNever();
 
             transitionBuilder.HasKey("EventId", "OperationId");
 

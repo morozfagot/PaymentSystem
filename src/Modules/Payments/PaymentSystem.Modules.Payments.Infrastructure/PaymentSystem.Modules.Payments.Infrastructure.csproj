@@ -8,15 +8,17 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.44" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.0" />
     <PackageReference Include="Scrutor" Version="4.2.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PaymentSystem.Modules.Payments.Application\PaymentSystem.Modules.Payments.Application.csproj" />
+    <ProjectReference Include="..\PaymentSystem.Modules.Payments.Presentation\PaymentSystem.Modules.Payments.Presentation.csproj" />
     <ProjectReference Include="..\..\..\Shared\PaymentSystem.Shared.Infrastructure\PaymentSystem.Shared.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Shared\PaymentSystem.Shared.Presentation\PaymentSystem.Shared.Presentation.csproj" />
   </ItemGroup>
 
 </Project>

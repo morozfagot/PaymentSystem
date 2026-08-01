@@ -9,23 +9,23 @@ using PaymentSystem.Modules.Payments.Domain.Operations;
 using PaymentSystem.Modules.Payments.Infrastructure.Database;
 using PaymentSystem.Modules.Payments.Infrastructure.Database.Outbox;
 using PaymentSystem.Modules.Payments.Infrastructure.Provider;
+using PaymentSystem.Modules.Payments.Presentation;
 using PaymentSystem.Shared.Application.Data;
 using PaymentSystem.Shared.Application.Messaging;
 using PaymentSystem.Shared.Infrastructure.Outbox;
-using Quartz;
+using PaymentSystem.Shared.Presentation.Endpoints;
 
 namespace PaymentSystem.Modules.Payments.Infrastructure;
 
 /// <summary>
-/// DI-регистрация слоя Infrastructure для модуля Payments.
+/// Регистрация модуля Payments в DI.
 /// </summary>
-public static class InfrastructureConfiguration
+public static class PaymentsModule
 {
     /// <summary>
-    /// Регистрирует PaymentsDbContext (SQLite), репозиторий, UnitOfWork, Outbox-обработку
-    /// и HTTP-клиент для provider-simulator.
+    /// Регистрирует все слои модуля Payments: Infrastructure, Presentation (endpoints).
     /// </summary>
-    public static IServiceCollection AddPaymentsInfrastructure(
+    public static IServiceCollection AddPaymentsModule(
         this IServiceCollection services,
         string connectionString,
         IConfiguration configuration)
@@ -37,9 +37,6 @@ public static class InfrastructureConfiguration
             options.AddInterceptors(sp.GetRequiredService<InsertOutboxMessagesInterceptor>());
         });
 
-        // Interceptor for outbox
-        services.AddScoped<InsertOutboxMessagesInterceptor>();
-
         // SQLite connection factory (для Dapper в ProcessOutboxJob)
         services.AddSingleton<IDbConnectionFactory>(
             _ => new PaymentsDbConnectionFactory(connectionString));
@@ -48,8 +45,7 @@ public static class InfrastructureConfiguration
         services.AddScoped<IOperationRepository, OperationRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        // Domain event handlers: регистрируем все реализации DomainEventHandler<>
-        // и декорируем каждую IdempotentDomainEventHandler<> для идемпотентности
+        // Domain event handlers
         AddDomainEventHandlers(services);
 
         // Outbox options из конфигурации
@@ -70,24 +66,17 @@ public static class InfrastructureConfiguration
         services.TryAddScoped<IPaymentService>(sp =>
             sp.GetRequiredService<ProviderSimulatorClient>());
 
-        // Quartz
-        services.AddQuartz(configurator =>
-        {
-        });
-
-        services.AddQuartzHostedService(options =>
-        {
-            options.WaitForJobsToComplete = true;
-        });
-
         services.ConfigureOptions<ConfigureProcessOutboxJob>();
+
+        // Endpoints
+        services.AddEndpoints(Presentation.AssemblyReference.Assembly);
 
         return services;
     }
 
     private static void AddDomainEventHandlers(IServiceCollection services)
     {
-        Type[] domainEventHandlerTypes = AssemblyReference.Assembly
+        Type[] domainEventHandlerTypes = Application.AssemblyReference.Assembly
             .GetTypes()
             .Where(t => t.IsAssignableTo(typeof(IDomainEventHandler)))
             .ToArray();

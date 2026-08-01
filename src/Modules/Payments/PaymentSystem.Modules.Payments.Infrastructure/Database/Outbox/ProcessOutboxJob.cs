@@ -99,19 +99,30 @@ internal sealed class ProcessOutboxJob(
                  content AS {nameof(OutboxMessageResponse.Content)},
                  type AS {nameof(OutboxMessageResponse.Type)},
                  try_count AS {nameof(OutboxMessageResponse.TryCount)}
-             FROM payments.outbox_messages
+             FROM outbox_messages
              WHERE processed_on_utc IS NULL
                AND (try_count IS NULL OR try_count < {MaxRetryAttempts})
              ORDER BY occurred_on_utc
              LIMIT {outboxOptions.Value.BatchSize}
-             FOR UPDATE
              """;
 
-        IEnumerable<OutboxMessageResponse> messages = await connection.QueryAsync<OutboxMessageResponse>(
-            sql,
-            transaction: transaction);
+        logger.LogDebug("ProcessOutboxJob SQL: {Sql}", sql);
 
-        return messages.ToList();
+        try
+        {
+            IEnumerable<OutboxMessageResponse> messages = await connection.QueryAsync<OutboxMessageResponse>(
+                sql,
+                transaction: transaction);
+
+            var result = messages.ToList();
+            logger.LogDebug("ProcessOutboxJob: Found {Count} messages", result.Count);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "ProcessOutboxJob: Error executing SQL");
+            throw;
+        }
     }
 
     private static async Task UpdateOutboxMessageAsync(
@@ -122,7 +133,7 @@ internal sealed class ProcessOutboxJob(
     {
         const string sql =
             """
-            UPDATE payments.outbox_messages
+            UPDATE outbox_messages
             SET processed_on_utc = @ProcessedOnUtc,
                 error = @Error,
                 try_count = COALESCE(try_count, 0) + 1
@@ -141,8 +152,8 @@ internal sealed class ProcessOutboxJob(
     }
 
     internal sealed record OutboxMessageResponse(
-        Guid Id,
+        string Id,
         string Content,
         string Type,
-        int? TryCount);
+        long TryCount);
 }

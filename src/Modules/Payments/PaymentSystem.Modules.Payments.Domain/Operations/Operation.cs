@@ -162,6 +162,7 @@ public sealed class Operation : Entity
     {
         var transition = new OperationTransition
         {
+            EventId = _transitions.Count + 1,
             OperationId = OperationId,
             Type = type,
             FromStatus = fromStatus,

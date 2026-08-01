@@ -15,7 +15,7 @@ public abstract class Entity
 
     public Guid Id { get; init; }
 
-    public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+    public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.ToList();
 
     public void RaiseDomainEvent(IDomainEvent domainEvent)
     {
